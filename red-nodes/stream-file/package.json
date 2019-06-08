@@ -7,7 +7,7 @@
     "node-red": {
         "nodes": {
             "stream-read-file": "stream-file.js",
-            "stream-write-file": "stream-file.js"
+            "stream-write-file": "stream-file.js",
             "glob": "glob.js"
         }
     }
