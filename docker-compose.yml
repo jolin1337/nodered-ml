@@ -1,0 +1,11 @@
+version: '3.1'
+services:
+    nodeserver:
+        # image: nodered/node-red-docker
+        build: .
+        restart: always
+        command: node ${NODE_OPTIONS} node_modules/node-red/red.js "--userDir" "/user-data"
+        volumes:
+            - ./:/user-data
+        ports:
+            - ${PORT}:1880
