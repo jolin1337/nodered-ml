@@ -1,0 +1,18 @@
+{
+    "name": "node-red-contrib-neural-network",
+    "dependencies": {
+        "@tensorflow/tfjs-node": "^1.1.2"
+    },
+    "node-red": {
+        "nodes": {
+            "sequential-network": "sequential-network.js",
+            "compile-model": "compile-model.js",
+            "save-model": "save-model.js",
+            "load-model": "load-model.js",
+            "list-models": "list-models.js",
+            "fit-model": "fit-model.js",
+            "dense-layer": "dense-layer.js",
+            "predict": "perdict.js"
+        }
+    }
+}

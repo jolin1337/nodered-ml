@@ -1,0 +1,27 @@
+<script type="text/javascript">
+    RED.nodes.registerType('list-models',{
+        category: 'neural-network',
+        color: 'chocolate',
+        defaults: {
+            name: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'fa-awesome/fa-database',
+        label () {
+            return this.name || "list-models";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="list-models">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="list-models">
+    <p>A node that lists all models currently in memory</p>
+</script>
+

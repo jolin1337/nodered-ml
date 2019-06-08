@@ -1,0 +1,51 @@
+<script type="text/javascript">
+    RED.nodes.registerType('save-model',{
+        category: 'neural-network',
+        color: 'chocolate',
+        defaults: {
+            name: { value: "" },
+            filename: {
+                value: ""
+            },
+            modelId: {
+                value: ""
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'fa-awesome/fa-database',
+        oneditprepare () {
+            const strType = {
+                default: 'str',
+                types: ['str']
+            }
+            $('#node-input-filename').typedInput(strType);
+            $('#node-input-modelId').typedInput(strType);
+        },
+        label () {
+            return this.name || "save-model";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="save-model">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-filename"><i class="fa fa-function"></i> Filename</label>
+        <input type="text" id="node-input-filename" placeholder="Filename">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-modelId">Model ID</label>
+        <input type="text" id="node-input-modelId" placeholder="Model ID">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="save-model">
+    <p>A node that stores a model to disk with or without the evaluation data</p>
+</script>
+

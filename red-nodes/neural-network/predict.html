@@ -1,0 +1,26 @@
+<script type="text/javascript">
+    RED.nodes.registerType('predict',{
+        category: 'neural-network',
+        color: 'chocolate',
+        defaults: {
+            name: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'fa-awesome/fa-microship',
+        label: function() {
+            return this.name||"predict";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="predict">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="dense-layer">
+    <p>A node that predicts a class to the input model in msg.modelid</p>
+</script>

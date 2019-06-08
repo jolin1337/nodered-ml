@@ -1,0 +1,72 @@
+<script type="text/javascript">
+    RED.nodes.registerType('dense-layer',{
+        category: 'neural-network',
+        color: 'chocolate',
+        defaults: {
+            name: { value: "" },
+            inputShape: {
+                value: undefined
+            },
+            activation: {
+                value: undefined
+            },
+            units: {
+                value: 200,
+                required: true
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'fa-awesome/fa-microship',
+        oneditprepare () {
+            const jsonType = {
+                default: 'json',
+                types: ['json']
+            };
+            const numType = {
+                default: 'num',
+                types: ['num']
+            };
+            $("#inputShape").val(JSON.stringify(this.inputShape));
+            $("#inputShape").typedInput(jsonType);
+            $("#units").val(this.units);
+            $("#units").typedInput(numType);
+
+        },
+        oneditsave () {
+            try {
+                this.inputShape = JSON.parse($("#inputShape").val()) || undefined;
+            } catch(e) { this.inputShape = undefined; }
+            this.units = parseInt($("#units").val());
+        },
+        label: function() {
+            return this.name || "dense-layer";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="dense-layer">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="units">Units</label>
+        <input id="units" placeholder="Units">
+    </div>
+
+    <div class="form-row">
+        <label for="inputShape">Input shape (only required for the first layer)</label>
+        <input type="text" id="inputShape" placeholder="Input shape">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-activation">Activation function</label>
+        <input type="text" id="node-input-activation" placeholder="Activation function">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="dense-layer">
+    <p>A node that adds a dense layer to the input model in msg.modelid</p>
+</script>

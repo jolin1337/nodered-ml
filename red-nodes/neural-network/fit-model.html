@@ -1,0 +1,95 @@
+<script type="text/javascript">
+    RED.nodes.registerType('fit-model',{
+        category: 'neural-network',
+        color: 'chocolate',
+        defaults: {
+            name: { value: "" },
+            xs: {
+                value: undefined,
+                required: true
+            },
+            ys: {
+                value: undefined,
+                required: true
+            },
+            batchSize: { value: 1 },
+            batchesPerEpoch: { value: 1 },
+            epochs: {
+                value: 1,
+                required: true
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'fa-awesome/fa-microship',
+        oneditprepare () {
+            const min = 1;
+            const jsonType = {
+                default: 'json',
+                types: ['json']
+            };
+            const numType = {
+                default: 'num',
+                types: ['num']
+            };
+            $('#xs').val(JSON.stringify(this.xs));
+            $('#ys').val(JSON.stringify(this.ys));
+
+            $('#batchSize').val(this.batchSize);
+            $('#batchesPerEpoch').val(this.batchesPerEpoch);
+            $('#epochs').val(this.epochs);
+
+            $('#xs').typedInput(jsonType);
+            $('#ys').typedInput(jsonType);
+
+            $('#batchSize').typedInput(numType);
+            $('#batchesPerEpoch').typedInput(numType);
+            $('#epochs').typedInput(numType);
+        },
+        oneditsave () {
+            this.xs = JSON.parse($('#xs').val());
+            this.ys = JSON.parse($('#ys').val());
+
+            this.batchSize = parseInt($("#batchSize").val());
+            this.batchesPerEpoch = parseInt($("#batchesPerEpoch").val());
+            this.epochs = parseInt($("#epochs").val());
+        },
+        label () {
+            return this.name || "fit-model";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="fit-model">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="xs"><i class="fa fa-code"></i> Named features</label>
+        <input type="text" id="xs" placeholder="Feature vector names">
+    </div>
+
+    <div class="form-row">
+        <label for="ys">Labels</label>
+        <input type="text" id="ys" placeholder="Label vector names">
+    </div>
+    <div class="form-row">
+        <label for="batchSize">Instances per batch</label>
+        <input type="text" id="batchSize" placeholder="Batch size">
+    </div>
+    <div class="form-row">
+        <label for="batchesPerEpoch">Batches per epoch</label>
+        <input type="text" id="batchesPerEpoch" placeholder="Batches per epoch">
+    </div>
+    <div class="form-row">
+        <label for="epochs">Epochs</label>
+        <input type="text" id="epochs" placeholder="Epochs">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="fit-model">
+    <p>A node that trains the model on streamed input data</p>
+</script>
+

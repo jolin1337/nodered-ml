@@ -1,0 +1,27 @@
+<script type="text/javascript">
+    RED.nodes.registerType('sequential-network',{
+        category: 'neural-network',
+        color: 'chocolate',
+        defaults: {
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "fa-microchip",
+        label: function() {
+            return this.name||"sequential-network";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="sequential-network">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="sequential-network">
+    <p>A node that creates a new neural network</p>
+</script>
+
