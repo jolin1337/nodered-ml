@@ -1,0 +1,93 @@
+<script type="text/javascript">
+    RED.nodes.registerType('stream-read-file',{
+        category: 'storage',
+        color: 'BurlyWood',
+        defaults: {
+            name: {value:""},
+            filename: {value:""},
+            ignoreTopNLines: { value: 0 },
+            maxLines: { value: "" },
+            ignoreBlankLines: { value: false }
+        },
+        inputs:1,
+        outputs:1,
+        icon: "file-in.png",
+        label: function() {
+            return this.name||"stream-read-file";
+        }
+    });
+
+    RED.nodes.registerType('stream-write-file',{
+        category: 'storage',
+        color: 'BurlyWood',
+        defaults: {
+            name: {value:""},
+            filename: {value:""},
+            heading: {value: ""},
+            ignoreBlankLines: { value: false }
+        },
+        inputs:1,
+        outputs:1,
+        icon: "file-out.png",
+        label: function() {
+            return this.name||"stream-write-file";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="stream-read-file">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-filename"><i class="fa fa-file"></i> Filename</label>
+        <input type="text" id="node-input-filename" placeholder="Filename">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-ignoreTopNLines">Ignore top N lines</label>
+        <input type="text" id="node-input-ignoreTopNLines" placeholder="N lines">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-maxLines">Read max N lines</label>
+        <input type="text" id="node-input-maxLines" placeholder="N lines">
+    </div>
+
+    <div class="form-row">
+        <input type="checkbox" id="node-input-ignoreBlankLines" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-ignoreBlankLines" style="width: auto">Ignore blank lines</label>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="stream-read-file">
+    <p>A simple node that reads a file line by line and stream it through differnt messages payload</p>
+</script>
+
+<script type="text/x-red" data-template-name="stream-write-file">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-filename"><i class="fa fa-file"></i> Filename</label>
+        <input type="text" id="node-input-filename" placeholder="Filename">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-heading">Heading</label>
+        <input type="text" id="node-input-heading" placeholder="Heading">
+    </div>
+
+    <div class="form-row">
+        <input type="checkbox" id="node-input-ignoreBlankLines" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-ignoreBlankLines" style="width: auto">Ignore blank lines</label>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="stream-write-file">
+    <p>A simple node that writes a file line by line from a stream of differnt messag payloads.</p>
+</script>

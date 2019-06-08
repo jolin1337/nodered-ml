@@ -1,0 +1,14 @@
+{
+    "name": "node-red-contrib-stream-file",
+    "dependencies": {
+        "event-stream": "^4.0.1",
+        "glob": "^7.1.4"
+    },
+    "node-red": {
+        "nodes": {
+            "stream-read-file": "stream-file.js",
+            "stream-write-file": "stream-file.js"
+            "glob": "glob.js"
+        }
+    }
+}

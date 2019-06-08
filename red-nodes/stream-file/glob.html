@@ -1,0 +1,27 @@
+<script type="text/javascript">
+    RED.nodes.registerType('glob',{
+        category: 'storage',
+        color: 'BurlyWood',
+        defaults: {
+            name: {value:""},
+            pattern: {value:""},
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "file-in.png",
+        label: function() {
+            return this.pattern || "glob";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="glob">
+    <div class="form-row">
+        <label for="node-input-pattern"><i class="fa fa-file"></i> Pattern</label>
+        <input type="text" id="node-input-pattern" placeholder="Pattern">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="glob">
+    <p>A simple node that prints file names found in directories matching a given pattern</p>
+</script>
