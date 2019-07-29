@@ -3,13 +3,14 @@
         category: 'neural-network',
         color: 'chocolate',
         defaults: {
-            name: {value:""}
+            name: {value:""},
+            modelId: {value:""}
         },
         inputs:1,
         outputs:1,
         icon: "fa-microchip",
         label: function() {
-            return this.name||"sequential-network";
+            return this.name||this.modelId||"sequential-network";
         }
     });
 </script>
@@ -18,6 +19,10 @@
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-modelId">Model ID</label>
+        <input type="text" id="node-input-modelId" placeholder="Model ID">
     </div>
 </script>
 

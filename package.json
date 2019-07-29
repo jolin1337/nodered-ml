@@ -4,6 +4,7 @@
     "version": "0.0.1",
     "private": true,
     "dependencies": {
+        "node-red-contrib-image-tools": "~0.2.4",
         "node-red-dashboard": "~2.15.3"
     }
 }

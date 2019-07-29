@@ -3,18 +3,19 @@ const models = require('./models')();
 
 module.exports = function(RED) {
     // Add dense layer to model
-    function DenseLayerNode(config) {
-        RED.nodes.createNode(this, config);
+    function DenseLayerNode(cfg) {
+        RED.nodes.createNode(this, cfg);
         this.on('input', (msg) => {
             const model = models.getModel(msg.modelId);
             const msgConfig = msg.config || {};
-            const { ...nodeConfig } = { ...config };
+            const { ...nodeConfig } = { ...cfg };
             const tfLayer = tf.layers.dense({
                 ...nodeConfig,
                 ...msgConfig
             })
             model.add(tfLayer);
-            this.send(msg);
+            const { config, ...m } = { ...msg };
+            this.send(m);
         });
     }
     RED.nodes.registerType("dense-layer", DenseLayerNode);

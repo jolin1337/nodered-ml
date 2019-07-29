@@ -8,7 +8,13 @@ module.exports = function(RED) {
         this.on('input', (msg) => {
             try {
                 const model = models.getModel(msg.modelId);
-                const predTensor = model.predict(tf.tensor2d([msg.payload], [1,4]));
+                const shape = [1];
+                let val = msg.payload;
+                while(val.length > 0) {
+                    shape.push(val.length);
+                    val = val[0];
+                }
+                const predTensor = model.predict(tf.tensor([msg.payload], shape));
                 msg.payload = {
                     feature: msg.payload,
                     prediction: Array.from(predTensor.dataSync()),

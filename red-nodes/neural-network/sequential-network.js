@@ -14,8 +14,9 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         this.on('input', function(msg) {
             const model = tf.sequential();
-            models.addModel(msg._msgid, model);
-            msg.modelId = msg._msgid;
+            const modelId = msg.modelId || config.modelId || msg._msgid;
+            models.addModel(modelId, model);
+            msg.modelId = modelId;
             this.send(msg);
         });
     }

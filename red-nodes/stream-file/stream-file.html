@@ -23,7 +23,7 @@
         defaults: {
             name: {value:""},
             filename: {value:""},
-            heading: {value: ""},
+            ignoreTopNLines: { value: 0 },
             ignoreBlankLines: { value: false }
         },
         inputs:1,
@@ -78,8 +78,8 @@
     </div>
 
     <div class="form-row">
-        <label for="node-input-heading">Heading</label>
-        <input type="text" id="node-input-heading" placeholder="Heading">
+        <label for="node-input-ignoreTopNLines">Ignore top N messages</label>
+        <input type="text" id="node-input-ignoreTopNLines" placeholder="N messages">
     </div>
 
     <div class="form-row">

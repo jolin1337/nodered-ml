@@ -4,8 +4,19 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         this.on('input', function(msg) {
             const pattern = config.pattern || msg.payload.pattern;
-            msg.payload = glob.sync(pattern);
-            this.send(msg);
+            const matches = glob.sync(pattern);
+            if (!config.oneMsgPerMatch) {
+                msg.payload = matches;
+                this.send(msg);
+            } else {
+                Array.from(matches).forEach((match, i) => {
+                    this.send({
+                        ...msg,
+                        payload: match,
+                        eof: matches.length === i + 1
+                    })
+                });
+            }
         });
     }
     RED.nodes.registerType("glob", GlobNode);

@@ -23,6 +23,8 @@
             $('#node-input-modelId').typedInput(strType);
         },
         label () {
+            if (this.modelId || this.filename)
+                return this.modelId + '->' + this.filename;
             return this.name || "save-model";
         }
     });

@@ -1,0 +1,162 @@
+const tf = require('@tensorflow/tfjs-node');
+const models = require('./models')();
+
+module.exports = function(RED) {
+    // Start the training
+    function FitModelNode(config) {
+        RED.nodes.createNode(this, config);
+        function msgToDataset(msg, cfg) {
+            const done = !!msg.eof || !!msg.stop;
+            return {
+                stop: msg.stop,
+                done: done || false,
+                topic: msg.topic,
+                value: {
+                    xs: tf.tensor([cfg.xs.map(x => msg.payload[x])]),
+                    ys: tf.tensor([cfg.ys.map(y => msg.payload[y])]),
+                    rxs: (cfg.xs.map(x => msg.payload[x])),
+                    rys: (cfg.ys.map(y => msg.payload[y]))
+                }
+            }
+        }
+        function useValSet(msg) {
+            return msg.topic === 'train' || msg.topic === 'val';
+        }
+        this.on('input', (msg) => {
+            if (this.index !== undefined) {
+                this.index++;
+                let ds = msgToDataset(msg, { ...config, ...msg.config })
+                if (ds.done) {
+                    console.log("Done found", ds);
+                    this.payloads.push(ds);
+                } else {
+                    this.payloads.splice(Math.max(0, this.payloads.length - 4), 0, ds);
+                }
+                for (let i = this.promises.length - 1; i >= 0; i--) {
+                    const promise = this.promises[i];
+                    const dsIdx = this.payloads.findIndex((ds) => !ds.done && (ds.topic === promise.topic || !useValSet(ds)));
+                    if (dsIdx >= 0) {
+                        const ds = this.payloads.splice(dsIdx, 1)[0];
+                        promise.call(ds);
+                        this.promises.splice(i, 1);
+                    }
+                }
+                return;
+            }
+            if (msg.topic === 'val') {
+                return;
+            }
+            const model = models.getModel(msg.modelId);
+            const msgConfig = msg.config || {};
+            const { name, ...nodeConfig } = { ...config };
+            const streamedDataset = (topic) => {
+                let sampleCount = 0;
+                return () => ({
+                    next: () => {
+                        if (this.payloads === undefined) {
+                            console.log("Too much!!");
+                            return Promise.resolve({ done: true });
+                        }
+                        let dsIdx = this.payloads.findIndex((ds) => !ds.done && (ds.topic === topic || !useValSet(ds)));
+                        if (dsIdx >= 0) {
+                            const ds = this.payloads.splice(dsIdx, 1)[0];
+                            ds.done &&  console.log(sampleCount + '/' + this.index, " samples processed", topic, ds.done);
+                            sampleCount++;
+                            return Promise.resolve(ds);
+                        }
+                        dsIdx = this.payloads.findIndex((ds) => ds.topic === topic || !useValSet(ds));
+                        if (dsIdx >= 0) {
+                            const ds = this.payloads.splice(dsIdx, 1)[0];
+                            ds.done &&  console.log(sampleCount + '/' + this.index, " samples processed", topic, ds.done);
+                            if (this.payloads.length === 0) {
+                                console.log("Done, cleaning")
+                                this.promises = this.payloads = this.index = undefined;
+                            }
+                            sampleCount++;
+                            return Promise.resolve(ds);
+                        }
+                        return new Promise((resolve, reject) => {
+                            // console.log("Waiting for more data...");
+                            this.promises.push({
+                                call: (ds) => {
+                                    ds.done && console.log(sampleCount + '/' + this.index, " samples processed", topic, ds.done);
+                                    if (ds.done && this.payloads.length === 0) {
+                                        console.log("Done, cleaning")
+                                        this.promises = this.payloads = this.index = undefined;
+                                    }
+                                    sampleCount++;
+                                    return resolve(ds);
+                                },
+                                topic
+                            });
+                        });
+                    }
+                });
+            };
+            let epoch = 0;
+            const trainDataset = tf.data.generator(streamedDataset('train')).batch(msgConfig.batchSize || config.batchSize);
+            if (useValSet(msg)) {
+                nodeConfig.validationData =  tf.data.generator(streamedDataset('val'));
+                const valBatchSize = nodeConfig.valBatchSize || msgConfig.valBatchSize;
+                if (valBatchSize) {
+                    nodeConfig.validationData.batch(valBatchSize);
+                }
+                // nodeConfig.validationBatches = nodeConfig.batchesPerEpoch;
+            }
+            if (this.payloads instanceof Array) {
+                this.payloads.push(msgToDataset(msg, { ...config, ...msg.config }));
+                this.index++;
+            } else {
+                this.payloads = [msgToDataset(msg, { ...config, ...msg.config })];
+                this.index = 1;
+                this.promises = [];
+            }
+
+            this.status({ fill: "yellow", shape: "dot", text: "Training..." });
+            setTimeout(() => {
+                model.fitDataset(trainDataset, {
+                    ...nodeConfig,
+                    ...msgConfig,
+                    callbacks: {
+                        onBatchEnd: (batch, logs) => {
+                            const epochs = msgConfig.epochs || nodeConfig.epochs;
+                            const batches = msgConfig.batchesPerEpoch || nodeConfig.batchesPerEpoch;
+                            const status = `Training (epoch: ${epoch + 1}/${epochs}, batch: ${batch + 1}/${batches}, acc: ${parseInt(100 * logs.acc)/100}`;
+                            console.log(status);
+                            this.status({
+                                fill: "yellow",
+                                shape: "dot",
+                                text: status
+                            });
+                        },
+                        onEpochEnd: (e, logs) => {
+                            const epochs = msgConfig.epochs || nodeConfig.epochs;
+                            const batches = msgConfig.batchesPerEpoch || nodeConfig.batchesPerEpoch;
+                            console.log("Epoch", e + 1);
+                            epoch++;
+                            msg.payload = {
+                                epoch,
+                                epochs,
+                                batches,
+                                acc: logs.acc,
+                                val_acc: logs.val_acc
+                            }
+                            this.send([msg, null]);
+                        }
+                    }
+                }).then(info => {
+                    msg.payload = info;
+                    this.payloads = this.index = undefined;
+                    this.status({ fill: "green", shape: "dot", text: "Trained model " + msg.modelId });
+                    this.send([null, msg]);
+                }).catch(err => {
+                    console.error(err);
+                    msg.payload = err;
+                    this.status({ fill: "red", shape: "ring", text: "Error: " + err.toString() });
+                    this.send([null, msg]);
+                });
+            }, 100);
+        });
+    }
+    RED.nodes.registerType("fit-model", FitModelNode);
+};

@@ -6,8 +6,10 @@ module.exports = function(RED) {
         this.on('input', function(msg) {
             let lineNr = 0;
             let previousLine = null;
-            const maxLines = parseInt(config.maxLines);
-            const rs = fs.createReadStream(config.filename || msg.filename)
+            const maxLines = parseInt(config.maxLines || msg.maxLines);
+            const ignoreTopNLines = parseInt(config.ignoreTopNLines || msg.ignoreTopNLines);
+            const ignoreBlankLines = config.ignoreBlankLines || msg.ignoreBlankLines;
+            const rs = fs.createReadStream(config.filename || msg.filename);
             rs.on('end', () => {
                   msg.payload = previousLine;
                   msg.lineNr = lineNr;
@@ -16,12 +18,14 @@ module.exports = function(RED) {
               })
               .pipe(es.split())
               .pipe(es.mapSync((line) => {
-                  if (lineNr >= maxLines && maxLines > 0) return;
-                  if (parseInt(config.ignoreTopNLines) > lineNr) {
+                  if (lineNr >= maxLines && maxLines > 0) {
+                      return;
+                  }
+                  if (parseInt(ignoreTopNLines) > lineNr) {
                       lineNr += 1;
                       return;
                   }
-                  if (config.ignoreBlankLines && line === '') {
+                  if (ignoreBlankLines && line === '') {
                       return;
                   }
                   if (previousLine !== null) {
@@ -31,9 +35,10 @@ module.exports = function(RED) {
                       lineNr += 1;
                       if (lineNr >= maxLines && maxLines > 0) {
                           msg.eof = true;
+                          rs.unpipe();
                           rs.destroy();
                       }
-                      this.send(msg);
+                      this.send({ ...msg });
                   }
                   previousLine = line;
               }));
@@ -48,18 +53,27 @@ module.exports = function(RED) {
             if (this.stream === undefined) {
                 this.filename = config.filename || msg.filename;
                 this.stream = fs.createWriteStream(this.filename);
+                this.lineNr = 0;
+                this.msg = msg;
+            }
+            this.lineNr += 1;
+            if (parseInt(config.ignoreTopNLines) > this.lineNr - 1) {
+                return;
             }
             if (!config.ignoreBlankLines || msg.payload !== '') {
                 this.stream.write(msg.payload + '\n');
             }
             if (msg.eof === true) {
                 this.stream.end();
-                msg.payload = {
+                this.msg.payload = {
                     filename: this.filename,
+                    lines: this.lineNr,
                     bytesWritten: this.stream.bytesWritten
                 };
-                this.stream = this.filename = undefined;
-                this.send(msg);
+                this.msg.eof = true;
+                this.msg.filename = this.filename;
+                this.send({ ...this.msg });
+                this.msg = this.lineNr = this.stream = this.filename = undefined;
             }
         });
     }

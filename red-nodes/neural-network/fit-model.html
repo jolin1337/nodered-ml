@@ -20,7 +20,7 @@
             }
         },
         inputs: 1,
-        outputs: 1,
+        outputs: 2,
         icon: 'fa-awesome/fa-microship',
         oneditprepare () {
             const min = 1;
@@ -35,9 +35,9 @@
             $('#xs').val(JSON.stringify(this.xs));
             $('#ys').val(JSON.stringify(this.ys));
 
-            $('#batchSize').val(this.batchSize);
-            $('#batchesPerEpoch').val(this.batchesPerEpoch);
-            $('#epochs').val(this.epochs);
+            $('#batchSize').val(this.batchSize || '');
+            $('#batchesPerEpoch').val(this.batchesPerEpoch || '');
+            $('#epochs').val(this.epochs || '');
 
             $('#xs').typedInput(jsonType);
             $('#ys').typedInput(jsonType);
@@ -47,12 +47,12 @@
             $('#epochs').typedInput(numType);
         },
         oneditsave () {
-            this.xs = JSON.parse($('#xs').val());
-            this.ys = JSON.parse($('#ys').val());
+            try { this.xs = JSON.parse($('#xs').val()); } catch (e) { this.xs = undefined; }
+            try { this.ys = JSON.parse($('#ys').val()); } catch (e) { this.ys = undefined; }
 
-            this.batchSize = parseInt($("#batchSize").val());
-            this.batchesPerEpoch = parseInt($("#batchesPerEpoch").val());
-            this.epochs = parseInt($("#epochs").val());
+            this.batchSize = parseInt($("#batchSize").val()) || undefined;
+            this.batchesPerEpoch = parseInt($("#batchesPerEpoch").val()) || undefined;
+            this.epochs = parseInt($("#epochs").val()) || undefined;
         },
         label () {
             return this.name || "fit-model";
