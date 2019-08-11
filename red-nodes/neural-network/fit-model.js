@@ -17,15 +17,15 @@ module.exports = function(RED) {
             if (msg.topic === 'val' || msg.topic === 'train') {
                 const valConfig = {
                     ...config,
-                    batchesPerEpoch: config.testBatchesPerEpoch,
-                    batchSize: config.testBatchSize,
+                    batchesPerEpoch: config.valBatchesPerEpoch,
+                    batchSize: config.valBatchSize,
                 };
                 valWriter = new fitModel.createDatasetWriter(valConfig);
                 valReader = new fitModel.createDatasetReader(valWriter, valConfig);
                 config.validationData =  tf.data.generator(() => valWriter);
-                if (config.testBatchSize) {
-                    config.validationData.batch(config.testBatchSize);
-                    //config.validationBatches = config.testBatchesPerEpoch;
+                if (config.valBatchSize) {
+                    config.validationData.batch(config.valBatchSize);
+                    //config.validationBatches = config.valBatchesPerEpoch;
                 }
             }
             const training = fitModel.createTraining(msg.modelId, tf.data.generator(() => writer).batch(config.trainBatchSize), config, {

@@ -69,11 +69,11 @@ function createDatasetWriter(cfg) {
                     }*/
                     ds.done = sampleCount > 0 && sampleCount % totalInstances === totalInstances-1;
                     sampleCount++;
-                    ds.done && console.log(sampleCount + '/' + totalInstances, " samples processed", ds.topic, ds.done, epochCount);
                     if (ds.done) {
                         // sampleCount = 0;
                         epochCount++;
                     }
+                    ds.done && console.log(sampleCount + '/' + totalInstances, " samples processed", ds.topic, ds.done, epochCount);
                     return resolve(ds);
                 }
             };
