@@ -78,5 +78,24 @@ const bot = new function() {
         }
 
         this.moveHistory = [];
-    }
+    };
+
+    this.loadModel = function (modelId) {
+        return fetch(`/models/${modelId}`)
+        .then(obj => obj.json())
+        .then(json => {
+            const model = json;
+            this.moveHistory = [];
+            this.qTable = model.qTable;
+        })
+        .catch(() => false);
+    };
+
+    this.saveModel = function (modelId) {
+        let {moveHistory, ...model} = this;
+        model = JSON.parse(JSON.stringify(model));
+        return $.post(`/models/${modelId}`, model, function (data, status, xhr) {
+            
+        });
+    };
 }

@@ -1,5 +1,5 @@
 /*
-   Copyright 2014 Nebez Briefkani
+   Copyright 2019 Johannes Lindén & Pontus Ekholm
    floppybird - main.js
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,20 +15,22 @@
    limitations under the License.
 */
 
-var states = Object.freeze({
+const states = Object.freeze({
    SplashScreen: 0,
    GameScreen: 1,
    ScoreScreen: 2
 });
 
-var gameState = {
+let gameState = {
    debugmode:true,
    currentState:states.SplashScreen,
    pipes:[],
    score:0,
+   scores: [],
    velocity:0,
    position:180,
    rotation:0,
+   runCounter:0,
    getPlayer(){
       return $('#player');
    }
@@ -38,19 +40,19 @@ let speed = 2;
 const gravity = 0.25;
 const jump = -4.6;
 
-var flyArea = $("#flyarea").height();
+let flyArea = $("#flyarea").height();
 
 
-var highscore = 0;
+let highscore = 0;
 
 const pipeheight = 90;
 const pipewidth = 52;
 
 
-var replayclickable = false;
+let replayclickable = false;
 
 //sounds
-var volume = 30;
+let volume = 30;
 const soundJump = new buzz.sound("assets/sounds/sfx_wing.ogg");
 const soundScore = new buzz.sound("assets/sounds/sfx_point.ogg");
 const soundHit = new buzz.sound("assets/sounds/sfx_hit.ogg");
@@ -73,9 +75,24 @@ $(document).ready(function() {
    if(savedscore != "")
       highscore = parseInt(savedscore);
 
-   //start with the splash screen
-   showSplash();
+   const modelid = getUrlParameter('model');
+   modelid && bot.loadModel(modelid).then(showSplash);
 });
+
+function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+};
 
 function getCookie(cname)
 {
@@ -135,6 +152,8 @@ function showSplash()
 function startGame()
 {
    let gs = getGameState();
+   gs.runCounter++;
+
    gs.currentState = states.GameScreen;
 
    //fade out the splash
@@ -144,6 +163,8 @@ function startGame()
    //update the big score
    setBigScore(false,gs);
    setBigMaxFrame(false, gs);
+   setRunCounter(false, gs);
+   setAvgScore(false, gs);
 
    //debug mode?
    if(gs.debugmode)
@@ -348,7 +369,7 @@ function gameloop(render) {
 $(document).keydown(function(e){
    //space bar!
    if(e.keyCode === 32){
-      gs = getGameState();
+      let gs = getGameState();
 
       //in ScoreScreen, hitting space should click the "replay" button. else it's just a regular spacebar hit
       if(gs.currentState === states.ScoreScreen){
@@ -361,15 +382,16 @@ $(document).keydown(function(e){
    }
 });
 
-//Handle mouse down OR touch start
-if("ontouchstart" in window)
-   $(document).on("touchstart", () => bot.getAction(gameState, true) && screenClick());
-else
-   $(document).on("mousedown", () => bot.getAction(gameState, true) && screenClick());
 $('#speed').change((e) => changeSpeed(e.target.value));
 $('#learnRate').change(e => changeLearnRate(e.target.value));
 $('#goodReward').change(e => changeGoodReward(e.target.value));
 $('#badReward').change(e => changeBadReward(e.target.value));
+$('#saveModel').on('click', () => {
+   const modelId = Date.now();
+   bot.saveModel(modelId).then(() => alert('Model saved as ' + modelId))
+   .catch(() => alert("Unable to save model" + modelId));
+});
+$('#loadModel').on('click', () => {location.href = 'http://localhost:5000/ui/#!/2';});
 
 function screenClick()
 {
@@ -386,10 +408,10 @@ function screenClick()
 }
 
 function changeGoodReward(newGoodReward) {
-   bot.reward['good'] = parseFloat(newGoodReward);
+   bot.rewards['good'] = parseFloat(newGoodReward);
 }
 function changeBadReward(newbadReward) {
-   bot.reward['bad'] = parseFloat(newbadReward);
+   bot.rewards['bad'] = parseFloat(newbadReward);
 }
 function changeLearnRate(newLearnRate) {
    bot.learnRate = parseFloat(newLearnRate);
@@ -419,31 +441,38 @@ function playerJump(gs)
    }
 }
 
+function setNumber(element, erase, score) {
+   const elemscore = $(element);
+   elemscore.empty();
+
+   if(erase){
+      return;
+   }
+   if (score === NaN) debugger;
+   const digits = score.toString().split('');
+   for(var i = 0; i < digits.length; i++) {
+      elemscore.append("<img src='assets/font_big_" + digits[i] + ".png' alt='" + digits[i] + "'>");
+   }
+}
+
 function setBigScore(erase, gs)
 {
-   var elemscore = $("#bigscore");
-   elemscore.empty();
-
-   if(erase){
-      return;
-   }
-
-   var digits = gs.score.toString().split('');
-   for(var i = 0; i < digits.length; i++)
-      elemscore.append("<img src='assets/font_big_" + digits[i] + ".png' alt='" + digits[i] + "'>");
+   setNumber('#bigscore', erase, gs.score);
 }
-function setBigMaxFrame(erase, gs)
+
+function setBigMaxFrame(erase, gs) {
+   setNumber('#bigmaxframe', erase, maxFrame);
+}
+
+function setAvgScore(erase, gs)
 {
-   var elemscore = $("#bigmaxframe");
-   elemscore.empty();
+   // Compute rolling avg
+   const avg = Math.ceil(gs.scores.reduce((g, s) => g + s, 0) / (gs.scores.length||1));
+   setNumber('#avgscore', erase, avg);
+}
 
-   if(erase){
-      return;
-   }
-
-   var digits = maxFrame.toString().split('');
-   for(var i = 0; i < digits.length; i++)
-      elemscore.append("<img src='assets/font_big_" + digits[i] + ".png' alt='" + digits[i] + "'>");
+function setRunCounter(erase, gs) {
+   setNumber('#runcounter', erase, gs.runCounter);
 }
 
 function setSmallScore(gs)
@@ -515,6 +544,9 @@ function playerDead()
    stopGameLoop();
 
    bot.updateQValues(false);
+   // keep most recent scores to compute rolling avg score
+   gs.scores.splice(0, Math.max(0, gs.scores.length - 19));
+   gs.scores.push(gs.score);
    showSplash();
    startGame();
    return;
@@ -546,6 +578,9 @@ function showScore(gs)
    //remove the big score
    setBigScore(true, gs);
    setBigMaxFrame(true, gs);
+   setRunCounter(false, gs);
+   setAvgScore(false, gs);
+
 
    //have they beaten their high score?
    if(gs.score > highscore)
@@ -624,6 +659,8 @@ function playerScore(gs)
    }
    setBigScore(false,gs);
    setBigMaxFrame(false, gs);
+   setRunCounter(false, gs);
+   setAvgScore(false, gs);
 }
 
 function updatePipes(speed, gs) {

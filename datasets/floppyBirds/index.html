@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <!--
-   Copyright 2014 Nebez Briefkani
-   floppybird - index.html
+   Copyright 2019 Johannes Lindén & Pontus Ekholm
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,10 +17,10 @@
 -->
 
    <head>
-      <title>Floppy Bird</title>
+      <title>Flappy Bird ML</title>
       <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-      <meta name="author" content="Nebez Briefkani" />
-      <meta name="description" content="play floppy bird. a remake of popular game flappy bird using just html/css/js" />
+      <meta name="author" content="Johannes Lindén & Pontus Ekholm" />
+      <meta name="description" content="Train a Q-learning model to play Flappy Bird! Set the hyperparameters and see how fast it converges" />
       <meta name="keywords" content="flappybird,flappy,bird,floppybird,floppy,html,html5,css,css3,js,javascript,jquery,github,nebez,briefkani,nebezb,open,source,opensource" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 
@@ -66,7 +65,8 @@
                   <input type="number" value="1" id="goodReward">
                   <legend for="badReward">Penalty</legend>
                   <input type="number" value="-1000" id="badReward">
-                  <input type="checkbox" id="debugmode">
+                  <input type="button" id="saveModel" value="Save model">
+                  <input type="button" id="loadModel" value="Load model">
                </div>
                <div id="flyarea">
                   <div id="ceiling" class="animated"></div>
@@ -75,6 +75,8 @@
 
                   <div id="bigscore"></div>
                   <div id="bigmaxframe"></div>
+                  <div id="runcounter"></div>
+                  <div id="avgscore"></div>
                   <!-- TODO: Add avg score count -->
                   <!-- TODO: Add time elapsed -->
 
@@ -95,8 +97,8 @@
       </div>
       <div id="footer">
          <a href="http://www.dotgears.com/">original game/concept/art by dong nguyen</a>
-         <a href="http://nebezb.com/">recreated by nebez briefkani</a>
-         <a href="http://github.com/nebez/floppybird/">view github project</a>
+         <a href="https://github.com/nebez/floppybird/">Flappybird project</a>
+         <a href="https://github.com/jolin1337/nodered-ml">Machine learning flappybirds project</a>
       </div>
       <div class="boundingbox" id="playerbox"></div>
       <div class="boundingbox" id="pipebox"></div>

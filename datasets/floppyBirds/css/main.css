@@ -243,7 +243,35 @@ Screen - Game
    z-index: 100;
 }
 #bigmaxframe:before {
-   content: 'Max pipes core';
+   content: 'Max pipes score';
+   position: absolute;
+   top: -18px;
+   white-space: nowrap;
+}
+
+#runcounter
+{
+   position: absolute;
+   top: -100px;
+   left: 300px;
+   z-index: 100;
+}
+#runcounter:before {
+   content: 'Runs elapsed';
+   position: absolute;
+   top: -18px;
+   white-space: nowrap;
+}
+
+#avgscore
+{
+   position: absolute;
+   top: -100px;
+   left: 450px;
+   z-index: 100;
+}
+#avgscore:before {
+   content: 'Average pipe score';
    position: absolute;
    top: -18px;
    white-space: nowrap;

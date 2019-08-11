@@ -3,3 +3,5 @@
 node_modules/
 package-lock.json
 *_cred.json
+models/
+datasets/
