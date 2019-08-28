@@ -8,6 +8,6 @@
         "neural-network": "file:./red-nodes/neural-network",
         "node-red-contrib-image-tools": "~0.2.4",
         "node-red-dashboard": "~2.15.3",
-        "stream-file": "file:./red-nodes/stream-file"
+        "node-red-contrib-stream-file": "file:./red-nodes/stream-file"
     }
 }
