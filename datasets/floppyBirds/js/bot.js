@@ -1,7 +1,7 @@
 const bot = new function() {
     this.discount = 1.0;
-    this.rewards = {good: 1.0, bad: -1000.0};
-    this.learnRate = 0.7
+    this.rewards = {good: 0.0, bad: 0.0};
+    this.learnRate = 0.0
     this.qTable = {};
     this.moveHistory = [];
 
