@@ -5,3 +5,6 @@ package-lock.json
 *_cred.json
 models/
 datasets/
+.sshkeys/
+.config.json
+projects/

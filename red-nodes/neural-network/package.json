@@ -1,5 +1,6 @@
 {
     "name": "node-red-contrib-neural-network",
+    "version": "0.0.1",
     "dependencies": {
         "@tensorflow/tfjs-node": "^1.1.2"
     },

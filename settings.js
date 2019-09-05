@@ -69,7 +69,7 @@ module.exports = {
 
     // To enabled pretty-printing of the flow within the flow file, set the following
     //  property to true:
-    //flowFilePretty: true,
+    flowFilePretty: true,
 
     // By default, credentials are encrypted in storage using a generated key. To
     // specify your own secret, set the following property.
@@ -91,22 +91,22 @@ module.exports = {
     // By default, the Node-RED UI is available at http://localhost:1880/
     // The following property can be used to specify a different root path.
     // If set to false, this is disabled.
-    //httpAdminRoot: '/admin',
+    httpAdminRoot: '/admin',
 
     // Some nodes, such as HTTP In, can be used to listen for incoming http requests.
     // By default, these are served relative to '/'. The following property
     // can be used to specifiy a different root path. If set to false, this is
     // disabled.
-    //httpNodeRoot: '/red-nodes',
+    httpNodeRoot: '/red',
 
     // The following property can be used in place of 'httpAdminRoot' and 'httpNodeRoot',
     // to apply the same root to both parts.
-    //httpRoot: '/red',
+    httpRoot: '/red',
 
     // When httpAdminRoot is used to move the UI to a different root path, the
     // following property can be used to identify a directory of static content
     // that should be served at http://localhost:1880/.
-    //httpStatic: '/home/nol/node-red-static/',
+    httpStatic: '/user-data/datasets/',
 
     // The maximum size of HTTP request that will be accepted by the runtime api.
     // Default: 5mb
@@ -269,7 +269,7 @@ module.exports = {
     editorTheme: {
         projects: {
             // To enable the Projects feature, set this value to true
-            enabled: false
+            enabled: true
         }
     }
 }
