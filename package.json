@@ -4,10 +4,12 @@
     "version": "0.0.1",
     "private": true,
     "dependencies": {
+        "jquery": "*",
         "@tensorflow/tfjs-node": "^1.2.5",
-        "node-red-contrib-neural-network": "file:./red-nodes/neural-network",
         "node-red-contrib-image-tools": "~0.2.4",
-        "node-red-dashboard": "~2.15.3",
-        "node-red-contrib-stream-file": "file:./red-nodes/stream-file"
+        "node-red-contrib-neural-network": "file:./red-nodes/neural-network",
+        "node-red-contrib-stream-file": "file:./red-nodes/stream-file",
+        "node-red-contrib-uibuilder": "~2.0.2",
+        "node-red-dashboard": "~2.15.3"
     }
 }

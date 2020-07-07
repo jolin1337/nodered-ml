@@ -4,6 +4,7 @@ services:
         # image: nodered/node-red-docker
         build: .
         restart: always
+        #command: node ${NODE_OPTIONS} node_modules/node-red/red.js "--userDir" "/user-data"
         command: bash -c 'cd /user-data && npm install && cd - && node ${NODE_OPTIONS} node_modules/node-red/red.js "--userDir" "/user-data"'
         volumes:
             - ./:/user-data
